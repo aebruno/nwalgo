@@ -1,0 +1,18 @@
+package nwalgo
+
+import (
+    "testing"
+)
+
+func TestAlign(t *testing.T) {
+    seqs := [][]string{
+        []string{"CGAGAGA","GAGAGA", "CGAGAGA", "-GAGAGA"} }
+
+    for _,a := range seqs {
+        aln1, aln2, _ := Align(a[0], a[1], 1, -1, -1)
+        if aln1 != a[2] || aln2 != a[3] {
+            t.Errorf("Align(%s, %s)\n***GOT***\n%s\n%s\n***WANT***\n%s\n%s", a[0],a[1],aln1,aln2,a[2],a[3])
+        }
+    }
+
+}
