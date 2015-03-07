@@ -8,7 +8,7 @@ var UP   = 1
 var LEFT = 2
 var NW   = 3
 
-func Align(a string, b string, match int, mismatch int, gap int) (string, string, int) {
+func Align(a ,b string, match, mismatch, gap int) (string, string, int) {
 
     alen := len(a)+1
     blen := len(b)+1
