@@ -15,8 +15,7 @@ Install
 
 Fetch from github::
 
-    $ go get install github.com/aebruno/nwalgo
-    $ go get install github.com/aebruno/nwalgo/nwalgo
+    $ go get github.com/aebruno/nwalgo/...
 
 -------------------------------------------------------------------------------
 Usage
@@ -40,14 +39,6 @@ From code::
     func main() {
         aln1, aln2, score := nwalgo.Align("GAAAAAAT", "GAAT", 1, -1, -1)
     }
-
-
--------------------------------------------------------------------------------
-License
--------------------------------------------------------------------------------
-
-nwalgo was written by Andrew E. Bruno and released under the GNU General
-Public License ("GPL") Version 3.0.  See the LICENSE file.
 
 -------------------------------------------------------------------------------
 References
