@@ -5,10 +5,11 @@
 package main
 
 import (
-    "fmt"
 	"flag"
+	"fmt"
 	"log"
-    "github.com/aebruno/nwalgo"
+
+	"github.com/aebruno/nwalgo"
 )
 
 var seq1 = flag.String("seq1", "", "first sequence")
@@ -18,11 +19,11 @@ var mismatch = flag.Int("mismatch", -1, "mismatch score")
 var gap = flag.Int("gap", -1, "gap penalty")
 
 func main() {
-    flag.Parse()
-    if *seq1 == "" || *seq2 == "" {
-        log.Fatal("Please provide 2 sequences to align. See nwalgo --help")
-    }
+	flag.Parse()
+	if *seq1 == "" || *seq2 == "" {
+		log.Fatal("Please provide 2 sequences to align. See nwalgo --help")
+	}
 
-    aln1, aln2, score := nwalgo.Align(*seq1, *seq2, *match, *mismatch, *gap)
-    fmt.Printf("%s\n%s\nScore: %d\n", aln1, aln2, score)
+	aln1, aln2, score := nwalgo.Align(*seq1, *seq2, *match, *mismatch, *gap)
+	fmt.Printf("%s\n%s\nScore: %d\n", aln1, aln2, score)
 }
