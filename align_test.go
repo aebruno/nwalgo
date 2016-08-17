@@ -20,3 +20,12 @@ func TestAlign(t *testing.T) {
 	}
 
 }
+
+func BenchmarkAlign(b *testing.B) {
+	seq1 := "GGAATTAATCCAGGTAATGGACCCCAAGAT"
+	seq2 := "GCCAGGATTCCCAGATATGGCCAAGGTTCC"
+
+	for i := 0; i < b.N; i++ {
+		Align(seq1, seq2, 1, -1, -1)
+	}
+}
