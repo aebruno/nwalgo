@@ -4,10 +4,6 @@
 
 package nwalgo
 
-import (
-	"fmt"
-)
-
 const (
 	Up   = 1
 	Left = 2
@@ -15,10 +11,18 @@ const (
 	None = 4
 )
 
-func Align(a, b string, match, mismatch, gap int) (string, string, int) {
+func Align(a, b string, match, mismatch, gap int) (alignA, alignB string, score int) {
 
 	alen := len(a) + 1
 	blen := len(b) + 1
+
+	maxLen := alen
+	if maxLen < blen {
+		maxLen = blen
+	}
+
+	aBytes := make([]byte, 0, maxLen)
+	bBytes := make([]byte, 0, maxLen)
 
 	f := make([][]int, alen)
 	pointer := make([][]int, alen)
@@ -68,26 +72,25 @@ func Align(a, b string, match, mismatch, gap int) (string, string, int) {
 
 	i := alen - 1
 	j := blen - 1
-	aln1 := ""
-	aln2 := ""
-	score := f[i][j]
+
+	score = f[i][j]
 
 	for p := pointer[i][j]; p != None; p = pointer[i][j] {
 		if p == NW {
-			aln1 = fmt.Sprintf("%c%s", a[i-1], aln1)
-			aln2 = fmt.Sprintf("%c%s", b[j-1], aln2)
+			aBytes = append([]byte(a[i-1:i]), aBytes...)
+			bBytes = append([]byte(b[j-1:j]), bBytes...)
 			i--
 			j--
 		} else if p == Up {
-			aln1 = fmt.Sprintf("%c%s", a[i-1], aln1)
-			aln2 = fmt.Sprintf("%s%s", "-", aln2)
+			aBytes = append([]byte(a[i-1:i]), aBytes...)
+			bBytes = append([]byte{'-'}, bBytes...)
 			i--
 		} else if p == Left {
-			aln1 = fmt.Sprintf("%s%s", "-", aln1)
-			aln2 = fmt.Sprintf("%c%s", b[j-1], aln2)
+			aBytes = append([]byte{'-'}, aBytes...)
+			bBytes = append([]byte(b[j-1:j]), bBytes...)
 			j--
 		}
 	}
 
-	return aln1, aln2, score
+	return string(aBytes), string(bBytes), score
 }
