@@ -4,88 +4,105 @@
 
 package nwalgo
 
-import (
-    "fmt"
+var (
+	Up   byte = 1
+	Left byte = 2
+	NW   byte = 3
+	None byte = 4
 )
 
-var UP    = 1
-var LEFT  = 2
-var NW    = 3
-var NONE  = 4
+func idx(i, j, bLen int) int {
+	return (i * bLen) + j
+}
 
-func Align(a ,b string, match, mismatch, gap int) (string, string, int) {
+func Align(a, b string, match, mismatch, gap int) (alignA, alignB string, score int) {
 
-    alen := len(a)+1
-    blen := len(b)+1
+	aLen := len(a) + 1
+	bLen := len(b) + 1
 
-    f := make([][]int, alen)
-    pointer := make([][]int, alen)
-    for i := range f {
-        f[i] = make([]int, blen)
-        pointer[i] = make([]int, blen)
-    }
+	maxLen := aLen
+	if maxLen < bLen {
+		maxLen = bLen
+	}
 
-    for i:= 1; i < alen; i++ {
-        f[i][0] = gap*i
-        pointer[i][0] = UP
-    }
-    for j:= 1; j < blen; j++ {
-        f[0][j] = gap*j
-        pointer[0][j] = LEFT
-    }
+	aBytes := make([]byte, 0, maxLen)
+	bBytes := make([]byte, 0, maxLen)
 
-    pointer[0][0] = NONE
-    for i:= 1; i < alen; i++ {
-        for j:= 1; j < blen; j++ {
-            match_mismatch := mismatch
-            if a[i-1] == b[j-1] {
-                match_mismatch = match
-            }
+	f := make([]int, aLen*bLen)
+	pointer := make([]byte, aLen*bLen)
 
-            max := f[i-1][j-1] + match_mismatch
-            hgap := f[i-1][j] + gap
-            vgap := f[i][j-1] + gap
-            if hgap > max {
-                 max = hgap
-            }
-            if vgap > max {
-                 max = vgap
-            }
+	for i := 1; i < aLen; i++ {
+		f[idx(i, 0, bLen)] = gap * i
+		pointer[idx(i, 0, bLen)] = Up
+	}
+	for j := 1; j < bLen; j++ {
+		f[idx(0, j, bLen)] = gap * j
+		pointer[idx(0, j, bLen)] = Left
+	}
 
-            p := NW;
-            if max == hgap  {
-                p = UP
-            } else if max == vgap {
-                p = LEFT
-            }
+	pointer[0] = None
 
-            pointer[i][j] = p
-            f[i][j] = max
-        }
-    }
+	for i := 1; i < aLen; i++ {
+		for j := 1; j < bLen; j++ {
+			matchMismatch := mismatch
+			if a[i-1] == b[j-1] {
+				matchMismatch = match
+			}
 
-    i := alen-1
-    j := blen-1
-    aln1 := ""
-    aln2 := ""
-    score := f[i][j]
+			max := f[idx(i-1, j-1, bLen)] + matchMismatch
+			hgap := f[idx(i-1, j, bLen)] + gap
+			vgap := f[idx(i, j-1, bLen)] + gap
 
-    for p := pointer[i][j]; p != NONE; p = pointer[i][j] {
-        if p == NW {
-            aln1 = fmt.Sprintf("%c%s", a[i-1], aln1)
-            aln2 = fmt.Sprintf("%c%s", b[j-1], aln2)
-            i--
-            j--
-        } else if p == UP  {
-            aln1 = fmt.Sprintf("%c%s", a[i-1], aln1)
-            aln2 = fmt.Sprintf("%s%s", "-", aln2)
-            i--
-        } else if p == LEFT  {
-            aln1 = fmt.Sprintf("%s%s", "-", aln1)
-            aln2 = fmt.Sprintf("%c%s", b[j-1], aln2)
-            j--
-        }
-    }
+			if hgap > max {
+				max = hgap
+			}
+			if vgap > max {
+				max = vgap
+			}
 
-    return aln1,aln2,score
+			p := NW
+			if max == hgap {
+				p = Up
+			} else if max == vgap {
+				p = Left
+			}
+
+			pointer[idx(i, j, bLen)] = p
+			f[idx(i, j, bLen)] = max
+		}
+	}
+
+	i := aLen - 1
+	j := bLen - 1
+
+	score = f[idx(i, j, bLen)]
+
+	for p := pointer[idx(i, j, bLen)]; p != None; p = pointer[idx(i, j, bLen)] {
+		if p == NW {
+			aBytes = append(aBytes, a[i-1])
+			bBytes = append(bBytes, b[j-1])
+			i--
+			j--
+		} else if p == Up {
+			aBytes = append(aBytes, a[i-1])
+			bBytes = append(bBytes, '-')
+			i--
+		} else if p == Left {
+			aBytes = append(aBytes, '-')
+			bBytes = append(bBytes, b[j-1])
+			j--
+		}
+	}
+
+	reverse(aBytes)
+	reverse(bBytes)
+
+	return string(aBytes), string(bBytes), score
+}
+
+func reverse(a []byte) {
+	for i := 0; i < len(a)/2; i++ {
+		j := len(a) - 1 - i
+		a[i], a[j] = a[j], a[i]
+	}
 }
