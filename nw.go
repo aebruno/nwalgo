@@ -77,20 +77,30 @@ func Align(a, b string, match, mismatch, gap int) (alignA, alignB string, score 
 
 	for p := pointer[i][j]; p != None; p = pointer[i][j] {
 		if p == NW {
-			aBytes = append([]byte(a[i-1:i]), aBytes...)
-			bBytes = append([]byte(b[j-1:j]), bBytes...)
+			aBytes = append(aBytes, a[i-1])
+			bBytes = append(bBytes, b[j-1])
 			i--
 			j--
 		} else if p == Up {
-			aBytes = append([]byte(a[i-1:i]), aBytes...)
-			bBytes = append([]byte{'-'}, bBytes...)
+			aBytes = append(aBytes, a[i-1])
+			bBytes = append(bBytes, '-')
 			i--
 		} else if p == Left {
-			aBytes = append([]byte{'-'}, aBytes...)
-			bBytes = append([]byte(b[j-1:j]), bBytes...)
+			aBytes = append(aBytes, '-')
+			bBytes = append(bBytes, b[j-1])
 			j--
 		}
 	}
 
+	reverse(aBytes)
+	reverse(bBytes)
+
 	return string(aBytes), string(bBytes), score
+}
+
+func reverse(a []byte) {
+	for i := 0; i < len(a)/2; i++ {
+		j := len(a) - 1 - i
+		a[i], a[j] = a[j], a[i]
+	}
 }
