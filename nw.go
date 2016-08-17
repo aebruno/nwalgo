@@ -11,46 +11,48 @@ const (
 	None = 4
 )
 
+func idx(i, j, bLen int) int {
+	return (i * bLen) + j
+}
+
 func Align(a, b string, match, mismatch, gap int) (alignA, alignB string, score int) {
 
-	alen := len(a) + 1
-	blen := len(b) + 1
+	aLen := len(a) + 1
+	bLen := len(b) + 1
 
-	maxLen := alen
-	if maxLen < blen {
-		maxLen = blen
+	maxLen := aLen
+	if maxLen < bLen {
+		maxLen = bLen
 	}
 
 	aBytes := make([]byte, 0, maxLen)
 	bBytes := make([]byte, 0, maxLen)
 
-	f := make([][]int, alen)
-	pointer := make([][]int, alen)
-	for i := range f {
-		f[i] = make([]int, blen)
-		pointer[i] = make([]int, blen)
+	f := make([]int, aLen*bLen)
+	pointer := make([]int, aLen*bLen)
+
+	for i := 1; i < aLen; i++ {
+		f[idx(i, 0, bLen)] = gap * i
+		pointer[idx(i, 0, bLen)] = Up
+	}
+	for j := 1; j < bLen; j++ {
+		f[idx(0, j, bLen)] = gap * j
+		pointer[idx(0, j, bLen)] = Left
 	}
 
-	for i := 1; i < alen; i++ {
-		f[i][0] = gap * i
-		pointer[i][0] = Up
-	}
-	for j := 1; j < blen; j++ {
-		f[0][j] = gap * j
-		pointer[0][j] = Left
-	}
+	pointer[0] = None
 
-	pointer[0][0] = None
-	for i := 1; i < alen; i++ {
-		for j := 1; j < blen; j++ {
-			match_mismatch := mismatch
+	for i := 1; i < aLen; i++ {
+		for j := 1; j < bLen; j++ {
+			matchMismatch := mismatch
 			if a[i-1] == b[j-1] {
-				match_mismatch = match
+				matchMismatch = match
 			}
 
-			max := f[i-1][j-1] + match_mismatch
-			hgap := f[i-1][j] + gap
-			vgap := f[i][j-1] + gap
+			max := f[idx(i-1, j-1, bLen)] + matchMismatch
+			hgap := f[idx(i-1, j, bLen)] + gap
+			vgap := f[idx(i, j-1, bLen)] + gap
+
 			if hgap > max {
 				max = hgap
 			}
@@ -65,17 +67,17 @@ func Align(a, b string, match, mismatch, gap int) (alignA, alignB string, score 
 				p = Left
 			}
 
-			pointer[i][j] = p
-			f[i][j] = max
+			pointer[idx(i, j, bLen)] = p
+			f[idx(i, j, bLen)] = max
 		}
 	}
 
-	i := alen - 1
-	j := blen - 1
+	i := aLen - 1
+	j := bLen - 1
 
-	score = f[i][j]
+	score = f[idx(i, j, bLen)]
 
-	for p := pointer[i][j]; p != None; p = pointer[i][j] {
+	for p := pointer[idx(i, j, bLen)]; p != None; p = pointer[idx(i, j, bLen)] {
 		if p == NW {
 			aBytes = append(aBytes, a[i-1])
 			bBytes = append(bBytes, b[j-1])
