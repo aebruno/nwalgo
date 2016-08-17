@@ -8,10 +8,12 @@ import (
 	"fmt"
 )
 
-var UP = 1
-var LEFT = 2
-var NW = 3
-var NONE = 4
+const (
+	Up   = 1
+	Left = 2
+	NW   = 3
+	None = 4
+)
 
 func Align(a, b string, match, mismatch, gap int) (string, string, int) {
 
@@ -27,14 +29,14 @@ func Align(a, b string, match, mismatch, gap int) (string, string, int) {
 
 	for i := 1; i < alen; i++ {
 		f[i][0] = gap * i
-		pointer[i][0] = UP
+		pointer[i][0] = Up
 	}
 	for j := 1; j < blen; j++ {
 		f[0][j] = gap * j
-		pointer[0][j] = LEFT
+		pointer[0][j] = Left
 	}
 
-	pointer[0][0] = NONE
+	pointer[0][0] = None
 	for i := 1; i < alen; i++ {
 		for j := 1; j < blen; j++ {
 			match_mismatch := mismatch
@@ -54,9 +56,9 @@ func Align(a, b string, match, mismatch, gap int) (string, string, int) {
 
 			p := NW
 			if max == hgap {
-				p = UP
+				p = Up
 			} else if max == vgap {
-				p = LEFT
+				p = Left
 			}
 
 			pointer[i][j] = p
@@ -70,17 +72,17 @@ func Align(a, b string, match, mismatch, gap int) (string, string, int) {
 	aln2 := ""
 	score := f[i][j]
 
-	for p := pointer[i][j]; p != NONE; p = pointer[i][j] {
+	for p := pointer[i][j]; p != None; p = pointer[i][j] {
 		if p == NW {
 			aln1 = fmt.Sprintf("%c%s", a[i-1], aln1)
 			aln2 = fmt.Sprintf("%c%s", b[j-1], aln2)
 			i--
 			j--
-		} else if p == UP {
+		} else if p == Up {
 			aln1 = fmt.Sprintf("%c%s", a[i-1], aln1)
 			aln2 = fmt.Sprintf("%s%s", "-", aln2)
 			i--
-		} else if p == LEFT {
+		} else if p == Left {
 			aln1 = fmt.Sprintf("%s%s", "-", aln1)
 			aln2 = fmt.Sprintf("%c%s", b[j-1], aln2)
 			j--
