@@ -4,11 +4,11 @@
 
 package nwalgo
 
-const (
-	Up   = 1
-	Left = 2
-	NW   = 3
-	None = 4
+var (
+	Up   byte = 1
+	Left byte = 2
+	NW   byte = 3
+	None byte = 4
 )
 
 func idx(i, j, bLen int) int {
@@ -29,7 +29,7 @@ func Align(a, b string, match, mismatch, gap int) (alignA, alignB string, score 
 	bBytes := make([]byte, 0, maxLen)
 
 	f := make([]int, aLen*bLen)
-	pointer := make([]int, aLen*bLen)
+	pointer := make([]byte, aLen*bLen)
 
 	for i := 1; i < aLen; i++ {
 		f[idx(i, 0, bLen)] = gap * i
