@@ -16,6 +16,11 @@ func idx(i, j, bLen int) int {
 }
 
 func Align(a, b string, match, mismatch, gap int, cfe bool) (alignA, alignB string, score int) {
+	aBytes, bBytes, score := AlignBytes([]byte(a), []byte(b), match, mismatch, gap, cfe)
+	return string(aBytes), string(bBytes), score
+}
+
+func AlignBytes(a, b []byte, match, mismatch, gap int, cfe bool) (alignA, alignB []byte, score int) {
 
 	aLen := len(a) + 1
 	bLen := len(b) + 1
@@ -133,7 +138,7 @@ func Align(a, b string, match, mismatch, gap int, cfe bool) (alignA, alignB stri
 	reverse(aBytes)
 	reverse(bBytes)
 
-	return string(aBytes), string(bBytes), score
+	return aBytes, bBytes, score
 }
 
 func reverse(a []byte) {
