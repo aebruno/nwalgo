@@ -15,7 +15,12 @@ func idx(i, j, bLen int) int {
 	return (i * bLen) + j
 }
 
-func Align(a, b string, match, mismatch, gap int) (alignA, alignB string, score int) {
+func Align(a, b string, match, mismatch, gap int, cfe bool) (alignA, alignB string, score int) {
+	aBytes, bBytes, score := AlignBytes([]byte(a), []byte(b), match, mismatch, gap, cfe)
+	return string(aBytes), string(bBytes), score
+}
+
+func AlignBytes(a, b []byte, match, mismatch, gap int, cfe bool) (alignA, alignB []byte, score int) {
 
 	aLen := len(a) + 1
 	bLen := len(b) + 1
@@ -32,11 +37,15 @@ func Align(a, b string, match, mismatch, gap int) (alignA, alignB string, score 
 	pointer := make([]byte, aLen*bLen)
 
 	for i := 1; i < aLen; i++ {
-		f[idx(i, 0, bLen)] = gap * i
+		if !cfe {
+			f[idx(i, 0, bLen)] = gap * i
+		}
 		pointer[idx(i, 0, bLen)] = Up
 	}
 	for j := 1; j < bLen; j++ {
-		f[idx(0, j, bLen)] = gap * j
+		if !cfe {
+			f[idx(0, j, bLen)] = gap * j
+		}
 		pointer[idx(0, j, bLen)] = Left
 	}
 
@@ -75,7 +84,39 @@ func Align(a, b string, match, mismatch, gap int) (alignA, alignB string, score 
 	i := aLen - 1
 	j := bLen - 1
 
-	score = f[idx(i, j, bLen)]
+	if cfe {
+		var maxRow, iCol int
+		for j := 0; j < bLen; j++ {
+			if f[idx(aLen-1, j, bLen)] > maxRow {
+				maxRow = f[idx(aLen-1, j, bLen)]
+				iCol = j
+			}
+		}
+
+		var maxCol, iRow int
+		for i := 0; i < aLen; i++ {
+			if f[idx(i, bLen-1, bLen)] > maxCol {
+				maxCol = f[idx(i, bLen-1, bLen)]
+				iRow = i
+			}
+		}
+
+		score = maxRow
+		if maxCol > maxRow {
+			score = maxCol
+		}
+		if maxRow > maxCol {
+			for k := iCol + 1; k < bLen; k++ {
+				pointer[idx(aLen-1, k, bLen)] = Left
+			}
+		} else {
+			for l := iRow + 1; l < aLen; l++ {
+				pointer[idx(l, bLen-1, bLen)] = Up
+			}
+		}
+	} else {
+		score = f[idx(i, j, bLen)]
+	}
 
 	for p := pointer[idx(i, j, bLen)]; p != None; p = pointer[idx(i, j, bLen)] {
 		if p == NW {
@@ -97,7 +138,7 @@ func Align(a, b string, match, mismatch, gap int) (alignA, alignB string, score 
 	reverse(aBytes)
 	reverse(bBytes)
 
-	return string(aBytes), string(bBytes), score
+	return aBytes, bBytes, score
 }
 
 func reverse(a []byte) {
